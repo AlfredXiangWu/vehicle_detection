@@ -1,0 +1,22 @@
+net: "vehicle_detection_train_test_fullconv.prototxt"
+
+test_iter: 100
+test_interval: 1000
+test_compute_loss: true
+
+base_lr: 0.01
+momentum: 0.9
+weight_decay: 0.0005
+lr_policy: "step"
+stepsize:25000
+gamma:0.457305051927326
+
+
+display: 100
+max_iter: 100000
+snapshot: 10000
+snapshot_prefix: "vehicle_detection_fullconv_net"
+
+solver_mode: GPU
+
+debug_info: false
