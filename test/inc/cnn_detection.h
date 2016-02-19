@@ -8,17 +8,17 @@
 #include <opencv2\opencv.hpp>
 
 #include "cnn.h"
+#include "ValStructVec.h"
 
 using namespace std;
 using namespace cv;
 
+
 int fullconv_cnn_init(Net *cnn, const char* modelPath); 
 
-int fullconv_multiscale_detect(const Mat img, vector<Rect> &bbox, Net *cnn, const int minSize, const int maxSize, const float scaleStep);
+int fullconv_multiscale_detect(const Mat img, ValStructVec<float, Rect> &bbox, Net *cnn, const int minSize, const int maxSize, const float scaleStep);
 
-int fullconv_cnn_detect(const Mat img,  Net *cnn) ;
-
-int upsample_feature_map();
+int fullconv_cnn_detect(const Mat img,  Net *cnn, const int stride, const float thr, const float sclae, ValStructVec<float, Rect> &bbox) ;
 
 int bbox_nms();
 

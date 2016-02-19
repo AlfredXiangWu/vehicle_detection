@@ -13,7 +13,7 @@ int fullconv_cnn_init(Net *cnn, const char* modelPath) {
 	return 0;
 }
 
-int fullconv_multiscale_detect(const Mat img, vecRect &bbox, Net *cnn, const int minSize, const int maxSize, const float scaleStep){
+int fullconv_multiscale_detect(const Mat img, ValStructVec<float, Rect> &bbox, Net *cnn, const int minSize, const int maxSize, const float scaleStep){
 	
 	// Convert RGB image to gray-scale
 	Mat imgGray;
@@ -34,16 +34,14 @@ int fullconv_multiscale_detect(const Mat img, vecRect &bbox, Net *cnn, const int
 	// Multi-scale detect
 	Mat imgResize;
 	for(float scale  = minScale; scale <= maxScale; scale = scale*scaleStep) {
-		vecPoint points;
 		resize(imgGray, imgResize, Size(imgGray.rows*scale, imgGray.cols*scale));
-		fullconv_cnn_detect(imgResize, cnn, stride, thr, points);
-		bbox_map(points, bbox, scale);
+		fullconv_cnn_detect(imgResize, cnn, stride, thr, scale, bbox);
 	}
 
 	return 0;
 }
 
-int fullconv_cnn_detect(const Mat img,  Net *cnn, const int stride, const float thr, vecPoint &points) {
+int fullconv_cnn_detect(const Mat img,  Net *cnn, const int stride, const float thr, const float scale, ValStructVec<float, Rect> &bbox) {
 
 	// convert pixel from [0, 255] to [0, 1]
 	int width = img.rows;
@@ -55,8 +53,7 @@ int fullconv_cnn_detect(const Mat img,  Net *cnn, const int stride, const float 
 	}
 
 	float* patch = (float*)malloc(NET_SIZE*NET_SIZE*sizeof(float));
-	ValStructVec<float, Point> valPoint;
-	Point coordinate;
+	Rect rect;
 
 	// window scanning (No multi-scale scanning)
 	for (int w = 0; w < width - NET_SIZE; w = w + stride) {
@@ -72,25 +69,17 @@ int fullconv_cnn_detect(const Mat img,  Net *cnn, const int stride, const float 
 			cnn->Forward();
 			float score = *(cnn->get_blob(PROB)->data + 1);
 			if (score > thr){
-				coordinate.x = w;
-				coordinate.y = h;
-				valPoint.pushBack(score, coordinate);
-				points.push_back(valPoint);
+				rect.x = w / scale;
+				rect.y = h / scale;
+				rect.width = NET_SIZE / scale;
+				rect.height = NET_SIZE / scale;
+				bbox.pushBack(score, rect);
 			}
 		}
 	}
 
 	free(patch);
 	free(data);
-	return 0;
-}
-
-int bbox_map(vecPoint points, vecRect &bbox, const float scale) {
-
-	Rect box;
-	for (int i = 0; i < points.size(); ++i) {
-
-	}
 	return 0;
 }
 

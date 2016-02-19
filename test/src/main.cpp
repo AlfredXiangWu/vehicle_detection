@@ -12,7 +12,7 @@ int main() {
 	int ret_init = fullconv_cnn_init(&cnn, modelPath);
 
 	// detect
-	vecRect bbox;
+	ValStructVec<float, Rect> bbox;
 	bbox.reserve(10000);
 	int stride = 10;
 	float thr = 0.5;
