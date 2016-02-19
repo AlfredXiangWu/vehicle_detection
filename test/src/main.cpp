@@ -12,7 +12,15 @@ int main() {
 	int ret_init = fullconv_cnn_init(&cnn, modelPath);
 
 	// detect
-	int ret_detector = fullconv_cnn_detect(img, &cnn);
+	vecRect bbox;
+	bbox.reserve(10000);
+	int stride = 10;
+	float thr = 0.5;
+	int minSize = 64;
+	int maxSize = min(img.cols, img.rows) / 2;
+	float step = 1.2;
+
+	int ret_detector = fullconv_multiscale_detect(img, bbox, &cnn, minSize, maxSize, step);
 
 	return 0;
 }
