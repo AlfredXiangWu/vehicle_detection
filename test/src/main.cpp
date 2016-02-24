@@ -12,15 +12,21 @@ int main() {
 	int ret_init = fullconv_cnn_init(&cnn, modelPath);
 
 	// detect
-	ValStructVec<float, Rect> bbox;
-	bbox.reserve(10000);
-	int stride = 10;
+	multimap<float, Rect>  bbox;
+	int stride = 5;
 	float thr = 0.5;
 	int minSize = 64;
-	int maxSize = min(img.cols, img.rows) / 2;
-	float step = 1.2;
+	int maxSize = min(img.cols, img.rows) / 3;
+	float step = 1.3;
 
 	int ret_detector = fullconv_multiscale_detect(img, bbox, &cnn, minSize, maxSize, step);
+
+
+	for(auto box = begin(bbox); box !=end(bbox); ++box) {
+		Rect rect = box->second;
+		rectangle(img, rect, Scalar(0, 0, 255), 2);
+	}
+	imwrite("result.jpg", img);
 
 	return 0;
 }
